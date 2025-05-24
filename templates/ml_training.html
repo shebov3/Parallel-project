@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}MPI ML Training{% endblock %}
+
+{% block header %}Parallel ML Training{% endblock %}
+{% block description %}Train a Linear Regression model using distributed computing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Upload Training Data</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV File</label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".csv" required>
+                        <div class="form-text">
+                            Upload a CSV file with training data. The last column should be the target variable,
+                            and all other columns are features.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="num_processes" class="form-label">Number of MPI Processes</label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2</option>
+                            <option value="4" selected>4</option>
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                        </select>
+                        <div class="form-text">Select the number of parallel processes to use.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Train Model</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>How it works: Parallel Linear Regression</h5>
+            </div>
+            <div class="card-body">
+                <p>This task demonstrates how MPI can be used to train a linear regression model in parallel:</p>
+                <ol>
+                    <li>The training data is distributed across multiple processes.</li>
+                    <li>Each process calculates partial gradients using its portion of the data.</li>
+                    <li>Gradients from all processes are combined to update the model parameters.</li>
+                    <li>This approach allows for significant speedup when training on large datasets.</li>
+                </ol>
+                <p>The implementation uses gradient descent to minimize the mean squared error cost function:</p>
+                <ul>
+                    <li><strong>Cost function:</strong> J(w,b) = (1/2m) Σ(f(x) - y)²</li>
+                    <li><strong>Prediction:</strong> f(x) = w·x + b</li>
+                    <li><strong>Gradient descent:</strong> w = w - α∇J(w,b)</li>
+                </ul>
+                <p>Where w is the weight vector, b is the bias term, and α is the learning rate.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

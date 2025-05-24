@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Sorting{% endblock %}
+
+{% block header %}Parallel Sorting{% endblock %}
+{% block description %}Odd-Even Transposition Sort implemented with MPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sorting-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .sorting-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+    }
+    
+    .card-header {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+    
+    .card-header h5 {
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card-header h5 i {
+        margin-right: 10px;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 8px;
+        color: var(--primary-light);
+    }
+    
+    .form-control, .form-select, textarea {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-control:focus, .form-select:focus, textarea:focus {
+        background-color: rgba(0, 0, 0, 0.4);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+        color: var(--text);
+    }
+    
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-sort {
+        background-color: var(--primary);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+    }
+    
+    .btn-sort:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+    
+    .btn-sort:active {
+        transform: translateY(0);
+    }
+    
+    .info-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        margin-top: 2rem;
+        border-left: 4px solid var(--accent);
+    }
+    
+    .info-card .card-header h5 {
+        color: var(--accent);
+    }
+    
+    .info-card ol {
+        padding-left: 1.5rem;
+        color: var(--text-muted);
+    }
+    
+    .info-card ol li {
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+        position: relative;
+    }
+    
+    .info-card ol li::before {
+        content: '';
+        position: absolute;
+        left: -1rem;
+        top: 0.5rem;
+        width: 6px;
+        height: 6px;
+        background-color: var(--primary);
+        border-radius: 50%;
+    }
+    
+    .alert-danger {
+        background-color: rgba(220, 38, 38, 0.2);
+        border: 1px solid var(--primary-dark);
+        color: var(--primary-light);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-danger i {
+        margin-right: 0.75rem;
+    }
+    
+    .example-btn {
+        background: none;
+        border: none;
+        color: var(--primary-light);
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.85rem;
+    }
+    
+    .example-btn:hover {
+        color: var(--primary);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="sorting-card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-sort-amount-down"></i> Input Numbers to Sort</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>{{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="post">
+                    <div class="mb-4">
+                        <label for="numbers" class="form-label">
+                            <i class="fas fa-list-ol"></i>Numbers (comma-separated)
+                        </label>
+                        <textarea class="form-control" id="numbers" name="numbers" rows="4" 
+                                  placeholder="e.g. 5, 3, 8, 1, 2, 9, 6, 4, 7" required></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Enter a list of integers separated by commas.
+                            <button type="button" class="example-btn ms-2" onclick="document.getElementById('numbers').value='5,3,8,1,2,9,6,4,7'">
+                                Load example
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="num_processes" class="form-label">
+                            <i class="fas fa-microchip"></i>Number of MPI Processes
+                        </label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2 processes</option>
+                            <option value="4" selected>4 processes (recommended)</option>
+                            <option value="8">8 processes</option>
+                            <option value="16">16 processes</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Select the number of parallel processes to use
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-sort">
+                            <i class="fas fa-random me-2"></i>Sort Numbers
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> How Odd-Even Transposition Sort Works</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">The Odd-Even Transposition Sort is a parallel sorting algorithm based on bubble sort that works as follows:</p>
+                <ol>
+                    <li>The data is distributed across multiple processes in equal portions.</li>
+                    <li>Each process begins by sorting its local portion of data.</li>
+                    <li>The algorithm performs alternating "odd" and "even" phases of comparisons and exchanges.</li>
+                    <li>In odd phases, odd-indexed processes exchange data with their right neighbors.</li>
+                    <li>In even phases, even-indexed processes exchange data with their right neighbors.</li>
+                    <li>After completing all phases, the data is globally sorted across all processes.</li>
+                </ol>
+                
+                <div class="mt-4 p-3 bg-dark rounded">
+                    <h6 class="text-primary mb-3"><i class="fas fa-lightbulb"></i> Algorithm Characteristics</h6>
+                    <ul class="text-muted" style="list-style-type: none; padding-left: 0;">
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Time complexity: O(n) with n processors</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Works well for small to medium datasets</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Demonstrates the power of parallel processing</li>
+                        <li><i class="fas fa-check-circle text-secondary me-2"></i>Excellent educational example of MPI communication patterns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('numbers').addEventListener('input', function(e) {
+        let cursorPos = e.target.selectionStart;
+        let originalValue = e.target.value;
+        
+        // Clean the value
+        let cleanedValue = originalValue
+            // .replace(/\s+/g, '')
+            // .replace(/,{2,}/g, ',')
+            // .replace(/^,|,$/g, '');
+        
+        // Only update if something actually changed
+        if (cleanedValue !== originalValue) {
+            e.target.value = cleanedValue;
+            // Maintain cursor position
+            e.target.setSelectionRange(cursorPos, cursorPos);
+        }
+    });
+</script>
+{% endblock %}

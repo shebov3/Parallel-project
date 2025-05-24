@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Matrix Multiplication{% endblock %}
+
+{% block header %}Parallel Matrix Multiplication{% endblock %}
+{% block description %}Multiply matrices using distributed computing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Matrix Multiplication</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Input Method</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="input_type" id="file_input" value="file" checked onchange="toggleInputMethod()">
+                            <label class="form-check-label" for="file_input">
+                                Upload CSV Files
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="input_type" id="manual_input" value="manual" onchange="toggleInputMethod()">
+                            <label class="form-check-label" for="manual_input">
+                                Manual Entry
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="file_input_section">
+                        <div class="mb-3">
+                            <label for="matrix_a" class="form-label">Matrix A (CSV)</label>
+                            <input class="form-control" type="file" id="matrix_a" name="matrix_a" accept=".csv">
+                            <div class="form-text">Upload a CSV file representing Matrix A.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="matrix_b" class="form-label">Matrix B (CSV)</label>
+                            <input class="form-control" type="file" id="matrix_b" name="matrix_b" accept=".csv">
+                            <div class="form-text">Upload a CSV file representing Matrix B.</div>
+                        </div>
+                    </div>
+                    
+                    <div id="manual_input_section" style="display: none;">
+                        <div class="mb-3">
+                            <label for="matrix_a_input" class="form-label">Matrix A</label>
+                            <textarea class="form-control" id="matrix_a_input" name="matrix_a_input" rows="4" placeholder="e.g.
+1,2,3
+4,5,6"></textarea>
+                            <div class="form-text">Enter comma-separated values, with one row per line.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="matrix_b_input" class="form-label">Matrix B</label>
+                            <textarea class="form-control" id="matrix_b_input" name="matrix_b_input" rows="4" placeholder="e.g.
+1,2
+3,4
+5,6"></textarea>
+                            <div class="form-text">Enter comma-separated values, with one row per line.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="num_processes" class="form-label">Number of MPI Processes</label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2</option>
+                            <option value="4" selected>4</option>
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                        </select>
+                        <div class="form-text">Select the number of parallel processes to use.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Multiply Matrices</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>How it works: Parallel Matrix Multiplication</h5>
+            </div>
+            <div class="card-body">
+                <p>This task demonstrates how MPI can be used to multiply matrices in parallel:</p>
+                <ol>
+                    <li>Matrix A is split into chunks (rows), with each MPI process receiving one chunk.</li>
+                    <li>Matrix B is broadcast to all processes.</li>
+                    <li>Each process performs matrix multiplication on its chunk of A with the entire matrix B.</li>
+                    <li>Results from all processes are gathered and combined to produce the final result matrix.</li>
+                    <li>This approach allows for significant speedup when multiplying large matrices.</li>
+                </ol>
+                <p class="mb-0">Requirements for matrix multiplication:</p>
+                <ul>
+                    <li>The number of columns in Matrix A must equal the number of rows in Matrix B.</li>
+                    <li>If A is an m×n matrix and B is an n×p matrix, then the result will be an m×p matrix.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleInputMethod() {
+        const fileInputSection = document.getElementById('file_input_section');
+        const manualInputSection = document.getElementById('manual_input_section');
+        const isFileInput = document.getElementById('file_input').checked;
+        
+        fileInputSection.style.display = isFileInput ? 'block' : 'none';
+        manualInputSection.style.display = isFileInput ? 'none' : 'block';
+    }
+</script>
+{% endblock %}
+{% endblock %} 

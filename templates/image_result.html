@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Image Processing Results{% endblock %}
+
+{% block header %}Image Processing Results{% endblock %}
+{% block description %}Processed image with {{ filter_type }} filter{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Processed Image</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Original File:</strong> {{ original_filename }}</p>
+                <p><strong>Filter Applied:</strong> {{ filter_type|capitalize }}</p>
+                
+                <div class="alert alert-info mt-3">
+                    <p class="mb-0"><strong>Processing Time:</strong> {{ processing_time|round(6) }} seconds</p>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <img src="data:image/jpeg;base64,{{ processed_image }}" class="img-fluid border rounded" alt="Processed image">
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/image_processing" class="btn btn-primary">Process Another Image</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

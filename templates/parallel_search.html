@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Parallel Search{% endblock %}
+
+{% block header %}Parallel Keyword Search{% endblock %}
+{% block description %}Find keywords in large text files using distributed processing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Upload Text and Search</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Text File (.txt)</label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".txt" required>
+                        <div class="form-text">Upload a text file to search for keywords.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="keyword" class="form-label">Keyword to Search</label>
+                        <input type="text" class="form-control" id="keyword" name="keyword" required>
+                        <div class="form-text">Enter the keyword or phrase to search for in the text.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="num_processes" class="form-label">Number of MPI Processes</label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2</option>
+                            <option value="4" selected>4</option>
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                        </select>
+                        <div class="form-text">Select the number of parallel processes to use.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>How it works: Parallel Text Search</h5>
+            </div>
+            <div class="card-body">
+                <p>This task demonstrates how MPI can be used to search for keywords in large text files in parallel:</p>
+                <ol>
+                    <li>The input text file is split into chunks, with each MPI process receiving one chunk.</li>
+                    <li>Each process searches for occurrences of the keyword in its chunk.</li>
+                    <li>To handle keywords that might span chunk boundaries, an overlap is added between chunks.</li>
+                    <li>Results from all processes are gathered, sorted, and duplicates are removed.</li>
+                    <li>This approach allows for significant speedup when searching large text files.</li>
+                </ol>
+                <p>Applications include document indexing, content analysis, and information retrieval systems.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

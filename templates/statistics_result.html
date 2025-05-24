@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics Results{% endblock %}
+
+{% block header %}Statistics Results{% endblock %}
+{% block description %}Statistical analysis results using parallel processing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Statistics Results</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>File:</strong> {{ filename }}</p>
+                
+                <div class="alert alert-info mt-3">
+                    <p class="mb-0"><strong>Processing Time:</strong> {{ processing_time|round(6) }} seconds</p>
+                </div>
+                
+                <div class="accordion mt-4" id="statisticsAccordion">
+                    {% for column_name, stats in result_data.items() %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ loop.index }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" 
+                                    aria-controls="collapse{{ loop.index }}">
+                                {{ column_name }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                             aria-labelledby="heading{{ loop.index }}" data-bs-parent="#statisticsAccordion">
+                            <div class="accordion-body">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">Mean</th>
+                                            <td>{{ stats.Mean|float|round(6) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Median</th>
+                                            <td>{{ stats.Median|float|round(6) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Mode</th>
+                                            <td>{{ stats.Mode|float|round(6) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Minimum</th>
+                                            <td>{{ stats.Min|float|round(6) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Maximum</th>
+                                            <td>{{ stats.Max|float|round(6) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Standard Deviation</th>
+                                            <td>{{ stats.StdDev|float|round(6) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="mt-3">
+                                    <div class="progress" style="height: 30px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ 100 * (stats.Mean|float - stats.Min|float) / (stats.Max|float - stats.Min|float) }}%;" 
+                                             aria-valuenow="{{ stats.Mean|float }}" aria-valuemin="{{ stats.Min|float }}" aria-valuemax="{{ stats.Max|float }}">
+                                            Mean: {{ stats.Mean|float|round(2) }}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <span>Min: {{ stats.Min|float|round(2) }}</span>
+                                        <span>Max: {{ stats.Max|float|round(2) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/statistics" class="btn btn-primary">Analyze Another Dataset</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

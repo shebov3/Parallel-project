@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Image Processing{% endblock %}
+
+{% block header %}Parallel Image Processing{% endblock %}
+{% block description %}Apply grayscale or blur filters to images in parallel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .image-processing-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .image-processing-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+    }
+    
+    .card-header {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+    
+    .card-header h5 {
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card-header h5 i {
+        margin-right: 10px;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 8px;
+        color: var(--primary-light);
+    }
+    
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.4);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+        color: var(--text);
+    }
+    
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-process {
+        background-color: var(--primary);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+    }
+    
+    .btn-process:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+    
+    .btn-process:active {
+        transform: translateY(0);
+    }
+    
+    .info-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        margin-top: 2rem;
+        border-left: 4px solid var(--accent);
+    }
+    
+    .info-card .card-header h5 {
+        color: var(--accent);
+    }
+    
+    .info-card ol, .info-card ul {
+        padding-left: 1.5rem;
+        color: var(--text-muted);
+    }
+    
+    .info-card ol li, .info-card ul li {
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+        position: relative;
+    }
+    
+    .info-card ol li::before {
+        content: '';
+        position: absolute;
+        left: -1rem;
+        top: 0.5rem;
+        width: 6px;
+        height: 6px;
+        background-color: var(--primary);
+        border-radius: 50%;
+    }
+    
+    .info-card ul li::before {
+        content: '•';
+        position: absolute;
+        left: -1rem;
+        color: var(--primary);
+    }
+    
+    .filter-examples {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-example {
+        flex: 1;
+        min-width: 200px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+    }
+    
+    .filter-example h6 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .filter-example h6 i {
+        margin-right: 8px;
+    }
+    
+    .alert-danger {
+        background-color: rgba(220, 38, 38, 0.2);
+        border: 1px solid var(--primary-dark);
+        color: var(--primary-light);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-danger i {
+        margin-right: 0.75rem;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .filter-examples {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="image-processing-card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-image"></i> Upload Image</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>{{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">
+                            <i class="fas fa-file-image"></i>Image File (.jpg, .png)
+                        </label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".jpg,.jpeg,.png" required>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Upload an image to process (max 10MB)
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="filter_type" class="form-label">
+                            <i class="fas fa-sliders-h"></i>Filter Type
+                        </label>
+                        <select class="form-select" id="filter_type" name="filter_type">
+                            <option value="grayscale" selected>Grayscale</option>
+                            <option value="blur">Blur</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Select the filter to apply to your image
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="num_processes" class="form-label">
+                            <i class="fas fa-microchip"></i>Number of MPI Processes
+                        </label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2 processes</option>
+                            <option value="4" selected>4 processes (recommended)</option>
+                            <option value="8">8 processes</option>
+                            <option value="16">16 processes</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> More processes may speed up large images
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-process">
+                            <i class="fas fa-magic me-2"></i>Process Image
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> How Parallel Image Processing Works</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">This MPI implementation processes images by distributing the workload across multiple processes:</p>
+                <ol>
+                    <li>The input image is divided into horizontal strips (one per process)</li>
+                    <li>Each process receives its portion of the image data</li>
+                    <li>The selected filter is applied independently to each portion</li>
+                    <li>Processed portions are gathered back to the root process</li>
+                    <li>The final image is reconstructed from all processed portions</li>
+                </ol>
+                
+                <div class="filter-examples">
+                    <div class="filter-example">
+                        <h6><i class="fas fa-moon"></i> Grayscale Filter</h6>
+                        <p class="text-muted">Converts the image to grayscale using the luminance formula:<br>
+                        <code>0.299*R + 0.587*G + 0.114*B</code></p>
+                    </div>
+                    <div class="filter-example">
+                        <h6><i class="fas fa-blur"></i> Blur Filter</h6>
+                        <p class="text-muted">Applies a simple box blur by averaging pixel values with their neighbors (3×3 kernel)</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-dark rounded">
+                    <h6 class="text-primary mb-3"><i class="fas fa-lightbulb"></i> Performance Notes</h6>
+                    <ul class="text-muted" style="list-style-type: none; padding-left: 0;">
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Larger images benefit more from parallel processing</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Blur filter requires more computation than grayscale</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Optimal process count depends on image size and CPU cores</li>
+                        <li><i class="fas fa-check-circle text-secondary me-2"></i>MPI communication overhead affects small images more</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

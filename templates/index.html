@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Parallel Processing{% endblock %}
+
+{% block header %}MPI Parallel Processing{% endblock %}
+{% block description %}Explore the power of distributed computing with MPI in Python{% endblock %}
+
+{% block extra_css %}
+<style>
+    .task-row {
+        background-color: var(--dark-light);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: var(--transition);
+        border-left: 4px solid transparent;
+    }
+    
+    .task-row:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.1);
+        border-left-color: var(--primary);
+    }
+    
+    .task-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+        color: var(--light);
+        margin-bottom: 0.5rem;
+    }
+    
+    .task-description {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    .task-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .btn-action {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .task-actions {
+            justify-content: flex-start;
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="task-container">
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">Parallel Sorting</h3>
+            <p class="task-description">Odd-Even Transposition Sort implemented with MPI for efficient distributed sorting</p>
+        </div>
+        <div class="task-actions">
+            <a href="/sort" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">File Processing</h3>
+            <p class="task-description">Count words and find unique words in text files using parallel processing</p>
+        </div>
+        <div class="task-actions">
+            <a href="/file_processing" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">Image Processing</h3>
+            <p class="task-description">Apply grayscale or blur filters to images in parallel for faster rendering</p>
+        </div>
+        <div class="task-actions">
+            <a href="/image_processing" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">ML Training</h3>
+            <p class="task-description">Train a linear regression model using distributed computing for faster convergence</p>
+        </div>
+        <div class="task-actions">
+            <a href="/ml_training" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">Parallel Search</h3>
+            <p class="task-description">Find keywords in large text files quickly with distributed processing</p>
+        </div>
+        <div class="task-actions">
+            <a href="/parallel_search" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">Statistics Analyzer</h3>
+            <p class="task-description">Compute comprehensive statistics on CSV data using parallel processing</p>
+        </div>
+        <div class="task-actions">
+            <a href="/statistics" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+    
+    <div class="task-row">
+        <div class="task-content">
+            <h3 class="task-title">Matrix Multiplication</h3>
+            <p class="task-description">Multiply large matrices efficiently using distributed computing algorithms</p>
+        </div>
+        <div class="task-actions">
+            <a href="/matrix" class="btn btn-primary btn-action">
+                <i class="fas fa-play me-2"></i>Try it
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

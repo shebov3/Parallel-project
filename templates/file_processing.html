@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}MPI File Processing{% endblock %}
+
+{% block header %}Parallel File Processing{% endblock %}
+{% block description %}Count words and remove duplicates in parallel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .upload-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+    }
+    
+    .card-header {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+    }
+    
+    .card-header h5 {
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card-header h5 i {
+        margin-right: 10px;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 8px;
+        color: var(--primary-light);
+    }
+    
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text);
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.4);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+        color: var(--text);
+    }
+    
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-submit {
+        background-color: var(--primary);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+    }
+    
+    .btn-submit:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    .info-card {
+        background-color: var(--dark-light);
+        border: none;
+        border-radius: var(--border-radius);
+        margin-top: 2rem;
+        border-left: 4px solid var(--primary);
+    }
+    
+    .info-card .card-header h5 {
+        color: var(--accent);
+    }
+    
+    .info-card ol {
+        padding-left: 1.5rem;
+        color: var(--text-muted);
+    }
+    
+    .info-card ol li {
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+    }
+    
+    .info-card ol li::marker {
+        color: var(--primary);
+        font-weight: bold;
+    }
+    
+    .alert-danger {
+        background-color: rgba(220, 38, 38, 0.2);
+        border: 1px solid var(--primary-dark);
+        color: var(--primary-light);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="upload-card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-file-upload"></i> Upload Text File</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">
+                            <i class="fas fa-file-alt"></i>Text File (.txt)
+                        </label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".txt" required>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Upload a text file to count words and identify unique words (max 10MB)
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="num_processes" class="form-label">
+                            <i class="fas fa-microchip"></i>Number of MPI Processes
+                        </label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2 processes</option>
+                            <option value="4" selected>4 processes (recommended)</option>
+                            <option value="8">8 processes</option>
+                            <option value="16">16 processes</option>
+                        </select>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> Select the number of parallel processes to use (more processes = faster but needs more resources)
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-submit">
+                            <i class="fas fa-play me-2"></i>Process File
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <div class="card-header">
+                <h5><i class="fas fa-cogs"></i> How Parallel File Processing Works</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">This task demonstrates how MPI can be used to process large text files in parallel:</p>
+                <ol>
+                    <li>The input text file is split into chunks, with each MPI process receiving one chunk.</li>
+                    <li>Each process counts words in its chunk and identifies unique words.</li>
+                    <li>Results from all processes are gathered and combined to produce the final count.</li>
+                    <li>This approach allows for significant speedup when processing large text files.</li>
+                </ol>
+                <div class="mt-4 p-3 bg-dark rounded">
+                    <h6 class="text-primary mb-3"><i class="fas fa-lightbulb"></i> Practical Applications</h6>
+                    <ul class="text-muted" style="list-style-type: none; padding-left: 0;">
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Document analysis and text mining</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Search engine indexing</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-secondary me-2"></i>Large corpus processing</li>
+                        <li><i class="fas fa-check-circle text-secondary me-2"></i>Natural language processing tasks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

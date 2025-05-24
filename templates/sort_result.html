@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Sorting Results{% endblock %}
+
+{% block header %}Sorting Results{% endblock %}
+{% block description %}Performance comparison between sequential and parallel sorting{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Sorted Numbers</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Original Numbers:</h6>
+                        <p class="text-muted">{{ original|join(', ') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Sorted Numbers:</h6>
+                        <p>{{ sorted|join(', ') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Performance Comparison</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Approach</th>
+                                    <th>Time (seconds)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sequential Sort</td>
+                                    <td>{{ seq_time|round(6) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Parallel Sort (MPI)</td>
+                                    <td>{{ parallel_time|round(6) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="alert alert-info">
+                            <strong>Speedup:</strong> {{ speedup|round(2) }}x faster with parallel processing
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="data:image/png;base64,{{ plot_url }}" class="img-fluid performance-chart" alt="Performance Comparison Chart">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/sort" class="btn btn-primary">Sort Another Set of Numbers</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

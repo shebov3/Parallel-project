@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}MPI Statistics Analyzer{% endblock %}
+
+{% block header %}Parallel Statistics Analyzer{% endblock %}
+{% block description %}Compute statistics on CSV data using distributed processing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Upload CSV Data</h5>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">CSV File</label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".csv" required>
+                        <div class="form-text">
+                            Upload a CSV file with numeric data. Each column will be analyzed independently.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="num_processes" class="form-label">Number of MPI Processes</label>
+                        <select class="form-select" id="num_processes" name="num_processes">
+                            <option value="2">2</option>
+                            <option value="4" selected>4</option>
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                        </select>
+                        <div class="form-text">Select the number of parallel processes to use.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Analyze Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>How it works: Parallel Statistics Calculation</h5>
+            </div>
+            <div class="card-body">
+                <p>This task demonstrates how MPI can be used to calculate statistics on large datasets in parallel:</p>
+                <ol>
+                    <li>The CSV data is distributed across multiple processes, with each process receiving a portion of the rows.</li>
+                    <li>Each process calculates basic statistics for its portion of the data: count, sum, min, max, sum of squares.</li>
+                    <li>Results from all processes are gathered and combined to calculate global statistics.</li>
+                    <li>For statistics that can't be calculated from partial results alone (like median and mode), all values are collected.</li>
+                    <li>This approach allows for significant speedup when processing large datasets.</li>
+                </ol>
+                <p>The following statistics are calculated for each column:</p>
+                <ul>
+                    <li><strong>Mean:</strong> The average value</li>
+                    <li><strong>Median:</strong> The middle value</li>
+                    <li><strong>Mode:</strong> The most common value</li>
+                    <li><strong>Min:</strong> The minimum value</li>
+                    <li><strong>Max:</strong> The maximum value</li>
+                    <li><strong>Standard Deviation:</strong> A measure of data dispersion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

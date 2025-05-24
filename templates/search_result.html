@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block header %}Search Results{% endblock %}
+{% block description %}Keyword search results using parallel processing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Search Results</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>File:</strong> {{ filename }}</p>
+                <p><strong>Keyword:</strong> "{{ keyword }}"</p>
+                
+                <div class="alert alert-info mt-3">
+                    <p class="mb-0"><strong>Processing Time:</strong> {{ search_time|round(6) }} seconds</p>
+                </div>
+                
+                <div class="card bg-light mb-3">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0">{{ occurrences }}</h3>
+                        <p class="text-muted">Total Occurrences</p>
+                    </div>
+                </div>
+                
+                {% if occurrences > 0 %}
+                <div class="mt-4">
+                    <h6>Positions:</h6>
+                    <div class="p-3 bg-light rounded" style="max-height: 200px; overflow-y: auto;">
+                        {% set pos_list = positions.split(',') %}
+                        {% for pos in pos_list %}
+                            <span class="badge bg-primary me-1 mb-1">{{ pos }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <h6>Search Statistics:</h6>
+                    {% if occurrences > 0 %}
+                        <ul>
+                            <li>Average distance between occurrences: 
+                                {% set pos_list = positions.split(',') | map('int') | list %}
+                                {% if pos_list|length > 1 %}
+                                    {% set distances = [] %}
+                                    {% for i in range(1, pos_list|length) %}
+                                        {% set dist = pos_list[i] - pos_list[i-1] %}
+                                        {% set distances = distances + [dist] %}
+                                    {% endfor %}
+                                    {% if distances|length > 0 %}
+                                        {{ (distances|sum / distances|length)|round(2) }} characters
+                                    {% else %}
+                                        N/A (cannot calculate distances)
+                                    {% endif %}
+                                {% else %}
+                                    N/A (only one occurrence)
+                                {% endif %}
+                            </li>
+                        </ul>
+                    {% else %}
+                        <p>No occurrences found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/parallel_search" class="btn btn-primary">Try Another Search</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

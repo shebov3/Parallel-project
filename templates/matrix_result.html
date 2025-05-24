@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Matrix Multiplication Results{% endblock %}
+
+{% block header %}Matrix Multiplication Results{% endblock %}
+{% block description %}Matrix multiplication performed with parallel processing{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Multiplication Result</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <p class="mb-0"><strong>Processing Time:</strong> {{ multiplication_time|round(6) }} seconds</p>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th colspan="{{ matrix_c[0]|length }}">Result Matrix C</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in matrix_c %}
+                            <tr>
+                                {% for cell in row %}
+                                <td>{{ cell|round(4) }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <h6>Matrix Properties:</h6>
+                    <ul>
+                        <li><strong>Dimensions:</strong> {{ matrix_c|length }} × {{ matrix_c[0]|length }}</li>
+                        {% set total_sum = 0 %}
+                        {% set total_elements = matrix_c|length * matrix_c[0]|length %}
+                        {% for row in matrix_c %}
+                            {% for cell in row %}
+                                {% set total_sum = total_sum + cell %}
+                            {% endfor %}
+                        {% endfor %}
+                        <li><strong>Sum of all elements:</strong> {{ total_sum|round(4) }}</li>
+                        <li><strong>Average value:</strong> {{ (total_sum / total_elements)|round(4) }}</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h6>Raw CSV Data:</h6>
+                    <div class="form-floating">
+                        <textarea class="form-control" id="matrixData" style="height: 150px">{% for row in matrix_c %}{{ row|join(',') }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+                        <label for="matrixData">Matrix C data (copy to use elsewhere)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/matrix" class="btn btn-primary">Multiply Another Set of Matrices</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('matrixData');
+        textarea.addEventListener('click', function() {
+            textarea.select();
+        });
+    });
+</script>
+{% endblock %} 
